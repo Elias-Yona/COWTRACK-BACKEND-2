@@ -9,9 +9,10 @@ User = get_user_model()
 
 class CustomerViewSet(ModelViewSet):
     serializer_class = CustomerSerializer
-    queryset = Customer.objects.all()
+    queryset = Customer.objects.all().select_related(
+        'user').order_by('-user__date_joined')
 
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-date_joined')
