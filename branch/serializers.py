@@ -4,20 +4,19 @@ from djoser.serializers import UserSerializer as BaseUserSerializer
 from .models import Customer
 
 
-class CustomerSerializer(WritableNestedModelSerializer):
-    class Meta:
-        model = Customer
-        fields = ['customer_id', 'phone_number',
-                  'kra_pin', 'contact_person', 'address', 'image']
+class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
+    class Meta(BaseUserSerializer.Meta):
+        extra_fields = ("first_name", "last_name",
+                        "is_superuser", "is_active", "is_staff", "date_joined")
+        fields = BaseUserSerializer.Meta.fields + extra_fields
 
-    username = serializers.CharField(max_length=50)
     date_joined = serializers.DateTimeField(read_only=True)
 
 
-class UserSerializer(BaseUserSerializer, WritableNestedModelSerializer):
-    customer = CustomerSerializer()
+class CustomerSerializer(WritableNestedModelSerializer):
+    user = UserSerializer()
 
-    class Meta(BaseUserSerializer.Meta):
-        extra_fields = ("first_name", "last_name",
-                        "is_superuser", "is_active", "is_staff", "date_joined", "customer")
-        fields = BaseUserSerializer.Meta.fields + extra_fields
+    class Meta:
+        model = Customer
+        fields = ['customer_id', 'phone_number',
+                  'kra_pin', 'contact_person', 'address', 'user']
