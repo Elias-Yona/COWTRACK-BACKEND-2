@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "cowtrack-backend-2"
+version = "0.1.0"
+description = "V2 version of cowtrack"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
