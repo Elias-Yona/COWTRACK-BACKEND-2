@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from django.contrib.auth import get_user_model
-from .serializers import CustomerSerializer, UserSerializer
-from .models import Customer
+from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer
+from .models import Customer, SalesPerson
 from .permissions import IsSuperUser
 
 
@@ -18,4 +18,10 @@ class CustomerViewSet(ModelViewSet):
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all().order_by('-date_joined')
+    permission_classes = (IsSuperUser,)
+
+
+class SalesPersonViewSet(ModelViewSet):
+    serializer_class = SalesPersonSerializer
+    queryset = SalesPerson.objects.all().order_by('-date_joined')
     permission_classes = (IsSuperUser,)
