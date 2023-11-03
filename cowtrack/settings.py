@@ -135,7 +135,7 @@ AUTH_USER_MODEL = 'core.user'
 
 if DEBUG:
     PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
     ]
 
 
@@ -146,3 +146,4 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
