@@ -23,5 +23,5 @@ class UserViewSet(ModelViewSet):
 
 class SalesPersonViewSet(ModelViewSet):
     serializer_class = SalesPersonSerializer
-    queryset = SalesPerson.objects.all().order_by('-date_joined')
+    queryset = SalesPerson.objects.all().order_by('-user__date_joined')
     permission_classes = (IsSuperUser,)
