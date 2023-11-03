@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer
 from .models import Customer, SalesPerson
-from .permissions import IsSuperUser
+from .permissions import IsSuperUser, IsSalesperson
 
 
 User = get_user_model()
@@ -30,7 +30,7 @@ class SalesPersonViewSet(ModelViewSet):
     queryset = SalesPerson.objects.all().order_by('-user__date_joined')
     permission_classes = (IsSuperUser,)
 
-    @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated, IsSalesperson])
     def me(self, request):
         salesperson = get_object_or_404(SalesPerson, user=request.user)
         serializer = self.get_serializer(salesperson)
