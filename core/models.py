@@ -8,7 +8,7 @@ class User(AbstractUser):
     MANAGER = "manager"
     SUPERVISOR = "supervisor"
     SUPPLIER = "supplier"
-    SALES_PERSON = "sales person"
+    SALESPERSON = "salesperson"
 
     ROLE_CHOICES = [
         (ADMIN, "Admin"),
@@ -16,12 +16,12 @@ class User(AbstractUser):
         (MANAGER, "Manager"),
         (SUPERVISOR, "Supervisor"),
         (SUPPLIER, "Supplier"),
-        (SALES_PERSON, "Sales person"),
+        (SALESPERSON, "Salesperson"),
     ]
 
     email = models.CharField(max_length=50, null=True)
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
-        default=SALES_PERSON,
+        default=SALESPERSON,
     )
