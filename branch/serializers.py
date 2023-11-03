@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
-from .models import Customer
+from .models import Customer, SalesPerson
 
 
 class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
@@ -24,3 +24,15 @@ class CustomerSerializer(WritableNestedModelSerializer):
 
     def get_image(self, manager):
         return f"https://ui-avatars.com/api/?name={manager.user.first_name}+{manager.user.last_name}"
+
+
+class SalesPersonSerializer(WritableNestedModelSerializer):
+    image = serializers.SerializerMethodField('get_image')
+    user = UserSerializer()
+
+    class Meta:
+        model = Customer
+        fields = ['sales_person_id', 'phone_number', 'user']
+
+    def get_image(self, salesperson):
+        return f"https://ui-avatars.com/api/?name={salesperson.user.first_name}+{salesperson.user.last_name}"
