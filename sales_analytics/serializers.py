@@ -2,6 +2,8 @@ from django.utils import timezone
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
+from templated_email import send_templated_mail
+
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch
 
 
@@ -64,4 +66,29 @@ class SalesPersonBranchSerializer(WritableNestedModelSerializer):
  
     def create(self, validated_data):
         validated_data['salesperson_id'] = self.context['salesperson_pk']
-        return super().create(validated_data)
+        salesperson_pk = validated_data.get('salesperson_id')
+
+        try:
+            spb = SalesPersonBranch.objects.filter(salesperson_id=salesperson_pk).order_by('-assignment_date').first()
+            if not spb.termination_date:
+                spb.termination_date = timezone.now()
+                spb.save()
+
+            send_templated_mail(
+                template_name='termination',
+                from_email='admin@cowtrack.com',
+                recipient_list=[spb.salesperson.user.email],
+                context={
+                    'salesperson_name': f'{spb.salesperson.user.first_name} {spb.salesperson.user.last_name}',
+                    'termination_date': spb.termination_date,
+                    'branch_name': spb.branch.branch_name,
+                    'image': f"https://ui-avatars.com/api/?name={spb.salesperson.user.first_name}+{spb.salesperson.user.last_name}"
+                },
+            )
+        except SalesPersonBranch.DoesNotExist:
+            print("**************** im hereeeeeeeeeeeeeeeeeeeee")
+            # validated_data['assignment_date'] = timezone.now()
+            print(validated_data)
+            return super().create(validated_data)
+
+        return spb

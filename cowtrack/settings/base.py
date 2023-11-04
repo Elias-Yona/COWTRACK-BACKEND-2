@@ -42,7 +42,6 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'djoser',
-    'templated_email',
 
     'core',
     'user_management',
@@ -136,12 +135,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.user'
 
 
-if DEBUG:
-    PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
-    ]
-
-
 REST_FRAMEWORK = {
    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
    'PAGE_SIZE': 10,
@@ -151,7 +144,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
