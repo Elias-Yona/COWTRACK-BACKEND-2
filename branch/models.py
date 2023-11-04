@@ -56,3 +56,14 @@ class Supplier(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.first_name} {self.user.last_name}"
+
+
+class Branch(models.Model):
+    branch_id = models.BigAutoField(primary_key=True)
+    branch_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField(max_length=50, unique=True)
+    opening_date = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.branch_name
