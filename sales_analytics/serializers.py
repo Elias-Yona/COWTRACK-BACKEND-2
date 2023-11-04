@@ -6,7 +6,7 @@ from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
 from templated_email import send_templated_mail
 
-from .models import Customer, SalesPerson, Branch, SalesPersonBranch
+from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager
 
 
 class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
@@ -124,7 +124,25 @@ class SalesPersonBranchSerializer(WritableNestedModelSerializer):
            
         except SalesPersonBranch.DoesNotExist:
             validated_data['assignment_date'] = timezone.now()
-            print(validated_data)
             return super().create(validated_data)
 
         return spb
+
+
+class ManagerSerializer(WritableNestedModelSerializer):
+    image = serializers.SerializerMethodField('get_image')
+    user = UserSerializer()
+
+    class Meta:
+        model = Manager
+        fields = ['manager_id', 'phone_number', 'image', 'user']
+
+    def get_image(self, manager):
+        return f"https://ui-avatars.com/api/?name={manager.user.first_name}+{manager.user.last_name}"
+    
+    def update(self, instance, validated_data):
+       instance.user.last_login = timezone.now()
+       user_data = validated_data.pop('user', None)
+       if user_data is not None:
+           UserSerializer().update(instance.user, user_data)
+       return super().update(instance, validated_data)
