@@ -66,7 +66,7 @@ class SalesPersonBranchSerializer(WritableNestedModelSerializer):
     assignment_date = serializers.DateTimeField(read_only=True)
     termination_date = serializers.DateTimeField(read_only=True)
 
-    def create_salesperson(self, **kwargs):
+    def assign_salesperson_to_branch(self, **kwargs):
         spb = SalesPersonBranch.objects.create(**kwargs["validated_data"])
         send_templated_mail(
             template_name='assignment',
@@ -85,7 +85,6 @@ class SalesPersonBranchSerializer(WritableNestedModelSerializer):
     def create(self, validated_data):
         validated_data['salesperson_id'] = self.context['salesperson_pk']
         salesperson_pk = validated_data.get('salesperson_id')
-        print(validated_data)
 
         try:
             spb = SalesPersonBranch.objects.filter(salesperson_id=salesperson_pk).order_by('-assignment_date').first()
@@ -107,13 +106,13 @@ class SalesPersonBranchSerializer(WritableNestedModelSerializer):
                 )
             
                 # assign the salesperson to the new branch
-                spb = self.create_salesperson(validated_data=validated_data)
+                spb = self.assign_salesperson_to_branch(validated_data=validated_data)
 
             elif not spb.termination_date and (spb.branch_id == validated_data["branch"].branch_id):
                 raise ValidationError({'message': 'Salesperson is already assigned to the branch'})
                 
             elif spb.termination_date:
-                spb = self.create_salesperson(validated_data=validated_data)
+                spb = self.assign_salesperson_to_branch(validated_data=validated_data)
            
         except SalesPersonBranch.DoesNotExist:
             validated_data['assignment_date'] = timezone.now()
