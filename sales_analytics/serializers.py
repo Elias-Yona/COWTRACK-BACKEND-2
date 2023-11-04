@@ -55,11 +55,15 @@ class BranchSerializer(WritableNestedModelSerializer):
 
 
 class SalesPersonBranchSerializer(WritableNestedModelSerializer):
-    salesperson = SalesPersonSerializer()
-    branch = BranchSerializer()
-    
+    # salesperson = SalesPersonSerializer()
+    # branch = BranchSerializer(many=True)
+
     class Meta:
         model = SalesPersonBranch
-        fields = ['salesperson_branch_id', 'salesperson', 'branch', 'created_at']
+        fields = ['salesperson_branch_id', 'branch', 'created_at']
 
     created_at = serializers.DateTimeField(read_only=True)
+
+    def create(self, validated_data):
+        validated_data['salesperson_id'] = self.context['salesperson_pk']
+        return super().create(validated_data)

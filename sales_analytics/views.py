@@ -51,7 +51,16 @@ class BranchViewSet(ModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
+
 class SalesPersonBranchViewSet(ModelViewSet):
     serializer_class = SalesPersonBranchSerializer
-    queryset = SalesPersonBranch.objects.all().order_by('-created_at')
     permission_classes = (IsSuperUser,)
+
+    def get_queryset(self):
+       salesperson_id = self.kwargs['salesperson_pk']
+       return SalesPersonBranch.objects.filter(salesperson_id=salesperson_id).order_by('-created_at')
+
+    def get_serializer_context(self):
+      context = super().get_serializer_context()
+      context.update({'salesperson_pk': self.kwargs['salesperson_pk']})
+      return context
