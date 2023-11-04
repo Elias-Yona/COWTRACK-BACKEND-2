@@ -64,7 +64,7 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
         user_data['is_active'] = 1
         user = User.objects.create(**user_data)
 
-        return Manager.objects.create(user=user, **validated_data)
+        return SalesPerson.objects.create(user=user, **validated_data)
 
 
 class BranchSerializer(WritableNestedModelSerializer):
