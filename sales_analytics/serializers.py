@@ -7,7 +7,7 @@ from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
 from templated_email import send_templated_mail
 
-from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager
+from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
 
 User = get_user_model()
 
@@ -176,3 +176,31 @@ class ManagerSerializer(WritableNestedModelSerializer):
         user = User.objects.create(**user_data)
 
         return Manager.objects.create(user=user, **validated_data)
+
+
+class SupplierSerializer(WritableNestedModelSerializer):
+    image = serializers.SerializerMethodField('get_image')
+    user = UserSerializer()
+
+    class Meta:
+        model = Supplier
+        fields = ['supplier_id', 'phone_number', 'kra_pin', 'contact_person', 'notes' 'image', 'user']
+
+    def get_image(self, supplier):
+        return f"https://ui-avatars.com/api/?name={supplier.user.first_name}+{supplier.user.last_name}"
+    
+    def update(self, instance, validated_data):
+       instance.user.last_login = timezone.now()
+       user_data = validated_data.pop('user', None)
+       if user_data is not None:
+           UserSerializer().update(instance.user, user_data)
+       return super().update(instance, validated_data)
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user_data['role'] = 'supplier'
+        user_data['username'] = user_data['email']
+        user_data['is_active'] = 1
+        user = User.objects.create(**user_data)
+
+        return Supplier.objects.create(user=user, **validated_data)
