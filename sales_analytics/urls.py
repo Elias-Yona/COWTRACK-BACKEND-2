@@ -1,4 +1,4 @@
-from rest_framework import routers
+from rest_framework_nested import routers
 from . import views
 
 
@@ -9,4 +9,8 @@ router.register('all-users', views.UserViewSet, basename='users-list')
 router.register('salespersons', views.SalesPersonViewSet, basename='salespersons-list')
 router.register('branches', views.BranchViewSet, basename='branches-list')
 
-urlpatterns = router.urls
+salesperson_router = routers.NestedSimpleRouter(router, r'salespersons', lookup='salesperson')
+salesperson_router.register(r'branches', views.SalesPersonBranchViewSet, basename='salesperson-branch')
+
+
+urlpatterns = router.urls + salesperson_router.urls
