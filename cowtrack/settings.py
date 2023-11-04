@@ -45,7 +45,7 @@ INSTALLED_APPS = [
 
     'core',
     'user_management',
-    'branch',
+    'sales_analytics',
 ]
 
 MIDDLEWARE = [

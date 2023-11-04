@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('branch', '0001_initial'),
+        ('sales_analytics', '0001_initial'),
     ]
 
     operations = [
