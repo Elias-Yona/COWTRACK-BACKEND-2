@@ -58,7 +58,7 @@ class SalesPersonBranchViewSet(ModelViewSet):
 
     def get_queryset(self):
        salesperson_id = self.kwargs['salesperson_pk']
-       return SalesPersonBranch.objects.filter(salesperson_id=salesperson_id).order_by('-created_at')
+       return SalesPersonBranch.objects.filter(salesperson_id=salesperson_id).order_by('-assignment_date')
 
     def get_serializer_context(self):
       context = super().get_serializer_context()

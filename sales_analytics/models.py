@@ -73,4 +73,5 @@ class SalesPersonBranch(models.Model):
     salesperson_branch_id = models.BigAutoField(primary_key=True)
     salesperson = models.ForeignKey(SalesPerson, on_delete=models.CASCADE)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    assignment_date = models.DateTimeField(auto_now_add=True)
+    termination_date = models.DateTimeField(null=True)
