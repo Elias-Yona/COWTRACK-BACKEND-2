@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
@@ -7,8 +8,11 @@ from .models import Customer, SalesPerson
 class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         extra_fields = ("first_name", "last_name",
-                        "is_superuser", "is_active", "username", "is_staff", "date_joined")
+                        "is_superuser", "is_active", "username", "is_staff", "date_joined", "last_login")
         fields = BaseUserSerializer.Meta.fields + extra_fields
+        read_only_fields = list(BaseUserSerializer.Meta.read_only_fields)
+        read_only_fields += ['last_login']
+        BaseUserSerializer.Meta.read_only_fields = tuple(read_only_fields)
 
     date_joined = serializers.DateTimeField(read_only=True)
 
@@ -39,6 +43,7 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
     
     def update(self, instance, validated_data):
        user_data = validated_data.pop('user', None)
+       user_data.last_login = timezone.now()
        if user_data is not None:
            UserSerializer().update(instance.user, user_data)
        return super().update(instance, validated_data)
