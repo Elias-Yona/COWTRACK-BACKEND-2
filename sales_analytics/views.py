@@ -42,7 +42,14 @@ class SalesPersonViewSet(ModelViewSet):
            return Response(serializer.data)
        
         serializer = self.get_serializer(salesperson)
-        return Response(serializer.data)
+        response_data = serializer.data
+
+        branches = SalesPersonBranch.objects.filter(salesperson=salesperson).order_by('-assignment_date')
+        branch_serializer = SalesPersonBranchSerializer(branches, many=True)
+
+        response_data['branches'] = branch_serializer.data
+
+        return Response(response_data)
 
 
 class BranchViewSet(ModelViewSet):
