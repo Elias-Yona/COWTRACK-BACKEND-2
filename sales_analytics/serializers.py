@@ -36,8 +36,14 @@ class CustomerSerializer(WritableNestedModelSerializer):
     def get_image(self, manager):
         return f"https://ui-avatars.com/api/?name={manager.user.first_name}+{manager.user.last_name}"
 
-    
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user_data['role'] = 'customer'
+        user_data['username'] = validated_data['phone_number']
+        user_data['is_active'] = 1
+        user = User.objects.create(**user_data)
 
+        return Customer.objects.create(user=user, **validated_data)
 
 class SalesPersonSerializer(WritableNestedModelSerializer):
     image = serializers.SerializerMethodField('get_image')
