@@ -5,7 +5,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
-from .models import Customer, SalesPerson, Branch
+from .serializers import SalesPersonBranchSerializer
+from .models import Customer, SalesPerson, Branch, SalesPersonBranch
 from .permissions import IsSuperUser, IsSalesperson
 
 
@@ -47,4 +48,10 @@ class SalesPersonViewSet(ModelViewSet):
 class BranchViewSet(ModelViewSet):
     serializer_class = BranchSerializer
     queryset = Branch.objects.all().order_by('-opening_date')
+    permission_classes = (IsSuperUser,)
+
+
+class SalesPersonBranchViewSet(ModelViewSet):
+    serializer_class = SalesPersonBranchSerializer
+    queryset = SalesPersonBranch.objects.all().order_by('-created_at')
     permission_classes = (IsSuperUser,)
