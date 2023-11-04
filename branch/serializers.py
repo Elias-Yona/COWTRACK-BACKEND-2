@@ -36,3 +36,9 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
 
     def get_image(self, salesperson):
         return f"https://ui-avatars.com/api/?name={salesperson.user.first_name}+{salesperson.user.last_name}"
+    
+    def update(self, instance, validated_data):
+       user_data = validated_data.pop('user', None)
+       if user_data is not None:
+           UserSerializer().update(instance.user, user_data)
+       return super().update(instance, validated_data)

@@ -35,10 +35,11 @@ class SalesPersonViewSet(ModelViewSet):
         salesperson = get_object_or_404(SalesPerson, user=request.user)
 
         if request.method == 'PUT':
-            serializer = self.get_serializer(salesperson, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data)
+           serializer = SalesPersonSerializer(salesperson, data=request.data, partial=True)
+           serializer.is_valid(raise_exception=True)
+           serializer.save()
+           return Response(serializer.data)
        
+        print("i'm here")
         serializer = self.get_serializer(salesperson)
         return Response(serializer.data)
