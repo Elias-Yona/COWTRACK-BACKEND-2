@@ -2,7 +2,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
-from .models import Customer, SalesPerson
+from .models import Customer, SalesPerson, Branch
 
 
 class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
@@ -46,3 +46,9 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
        if user_data is not None:
            UserSerializer().update(instance.user, user_data)
        return super().update(instance, validated_data)
+
+
+class BranchSerializer(WritableNestedModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['branch_id', 'branch_name', 'phone_number', 'email', 'opening_date',]
