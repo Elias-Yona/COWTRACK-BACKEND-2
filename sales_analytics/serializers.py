@@ -2,7 +2,7 @@ from django.utils import timezone
 from rest_framework import serializers
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
-from .models import Customer, SalesPerson, Branch
+from .models import Customer, SalesPerson, Branch, SalesPersonBranch
 
 
 class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
@@ -52,3 +52,14 @@ class BranchSerializer(WritableNestedModelSerializer):
     class Meta:
         model = Branch
         fields = ['branch_id', 'branch_name', 'phone_number', 'email', 'opening_date',]
+
+
+class SalesPersonBranchSerializer(WritableNestedModelSerializer):
+    salesperson = SalesPersonSerializer()
+    branch = BranchSerializer()
+    
+    class Meta:
+        model = SalesPersonBranch
+        fields = ['salesperson_branch_id', 'salesperson', 'branch', 'created_at']
+
+    created_at = serializers.DateTimeField(read_only=True)
