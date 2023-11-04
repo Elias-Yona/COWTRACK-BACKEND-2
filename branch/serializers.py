@@ -11,10 +11,9 @@ class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
                         "is_superuser", "is_active", "username", "is_staff", "date_joined", "last_login")
         fields = BaseUserSerializer.Meta.fields + extra_fields
         read_only_fields = list(BaseUserSerializer.Meta.read_only_fields)
-        read_only_fields += ['last_login']
+        read_only_fields += ['last_login', 'date_joined']
         BaseUserSerializer.Meta.read_only_fields = tuple(read_only_fields)
 
-    date_joined = serializers.DateTimeField(read_only=True)
 
 
 class CustomerSerializer(WritableNestedModelSerializer):
@@ -42,8 +41,8 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
         return f"https://ui-avatars.com/api/?name={salesperson.user.first_name}+{salesperson.user.last_name}"
     
     def update(self, instance, validated_data):
+       instance.user.last_login = timezone.now()
        user_data = validated_data.pop('user', None)
-       user_data.last_login = timezone.now()
        if user_data is not None:
            UserSerializer().update(instance.user, user_data)
        return super().update(instance, validated_data)
