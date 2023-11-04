@@ -5,9 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
-from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer
-from .models import Customer, SalesPerson, Branch, SalesPersonBranch
-from .permissions import IsSuperUser, IsSalesperson
+from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
+from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager
+from .permissions import IsSuperUser, IsSalesperson, IsManager
 
 
 User = get_user_model()
@@ -48,6 +48,27 @@ class SalesPersonViewSet(ModelViewSet):
         branch_serializer = SimpleSalesPersonBranchSerializer(branches, many=True)
 
         response_data['branches'] = branch_serializer.data
+
+        return Response(response_data)
+
+
+class ManagerViewSet(ModelViewSet):
+    serializer_class = ManagerSerializer
+    queryset = Manager.objects.all().select_related('user').order_by('-user__date_joined')
+    permission_classes = (IsSuperUser,)
+
+    @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated, IsManager])
+    def me(self, request):
+        manager = get_object_or_404(Manager.objects.select_related('user'), user=request.user)
+
+        if request.method == 'PUT':
+           serializer = ManagerSerializer(manager, data=request.data, partial=True)
+           serializer.is_valid(raise_exception=True)
+           serializer.save()
+           return Response(serializer.data)
+       
+        serializer = self.get_serializer(manager)
+        response_data = serializer.data
 
         return Response(response_data)
 
