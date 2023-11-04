@@ -1,10 +1,11 @@
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from drf_writable_nested.serializers import WritableNestedModelSerializer
-from djoser.serializers import UserSerializer as BaseUserSerializer
+from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
@@ -12,10 +13,10 @@ from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, S
 User = get_user_model()
 
 
-class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
+class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer, UserCreateSerializer):
     class Meta(BaseUserSerializer.Meta):
         extra_fields = ("first_name", "last_name",
-                        "is_superuser", "is_active", "username", "is_staff", "role", "date_joined", "last_login")
+                        "is_superuser", "is_active", "username", "is_staff", "role", "date_joined", "last_login", "password")
         fields = BaseUserSerializer.Meta.fields + extra_fields
         read_only_fields = list(BaseUserSerializer.Meta.read_only_fields)
         # read_only_fields.remove('username')
@@ -52,6 +53,7 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
     class Meta:
         model = SalesPerson
         fields = ['sales_person_id', 'phone_number', 'image', 'user']
+   
 
     def get_image(self, salesperson):
         return f"https://ui-avatars.com/api/?name={salesperson.user.first_name}+{salesperson.user.last_name}"
@@ -68,6 +70,7 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
         user_data['role'] = 'salesperson'
         user_data['username'] = user_data['email']
         user_data['is_active'] = 1
+        user_data['password'] = make_password(user_data['password'])
         user = User.objects.create(**user_data)
 
         return SalesPerson.objects.create(user=user, **validated_data)
