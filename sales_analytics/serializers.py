@@ -166,6 +166,7 @@ class ManagerSerializer(WritableNestedModelSerializer):
         user_data = validated_data.pop('user')
         user_data['role'] = 'manager'
         user_data['username'] = user_data['email']
+        user_data['is_active'] = 1
         user = User.objects.create(**user_data)
 
         return Manager.objects.create(user=user, **validated_data)
