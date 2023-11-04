@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
@@ -8,13 +9,16 @@ from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager
 
+User = get_user_model()
+
 
 class UserSerializer(WritableNestedModelSerializer, BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         extra_fields = ("first_name", "last_name",
-                        "is_superuser", "is_active", "username", "is_staff", "date_joined", "last_login")
+                        "is_superuser", "is_active", "username", "is_staff", "role", "date_joined", "last_login")
         fields = BaseUserSerializer.Meta.fields + extra_fields
         read_only_fields = list(BaseUserSerializer.Meta.read_only_fields)
+        # read_only_fields.remove('username')
         read_only_fields += ['last_login', 'date_joined']
         BaseUserSerializer.Meta.read_only_fields = tuple(read_only_fields)
 
@@ -146,3 +150,11 @@ class ManagerSerializer(WritableNestedModelSerializer):
        if user_data is not None:
            UserSerializer().update(instance.user, user_data)
        return super().update(instance, validated_data)
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user_data['role'] = 'manager'
+        user_data['username'] = user_data['email']
+        user = User.objects.create(**user_data)
+
+        return Manager.objects.create(user=user, **validated_data)
