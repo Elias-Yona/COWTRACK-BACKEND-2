@@ -184,7 +184,7 @@ class SupplierSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = Supplier
-        fields = ['supplier_id', 'phone_number', 'kra_pin', 'contact_person', 'notes' 'image', 'user']
+        fields = ['supplier_id', 'phone_number', 'kra_pin', 'contact_person', 'notes', 'image', 'user']
 
     def get_image(self, supplier):
         return f"https://ui-avatars.com/api/?name={supplier.user.first_name}+{supplier.user.last_name}"
