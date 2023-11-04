@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
-from .serializers import SalesPersonBranchSerializer
+from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch
 from .permissions import IsSuperUser, IsSalesperson
 
@@ -45,7 +45,7 @@ class SalesPersonViewSet(ModelViewSet):
         response_data = serializer.data
 
         branches = SalesPersonBranch.objects.filter(salesperson=salesperson).order_by('-assignment_date')
-        branch_serializer = SalesPersonBranchSerializer(branches, many=True)
+        branch_serializer = SimpleSalesPersonBranchSerializer(branches, many=True)
 
         response_data['branches'] = branch_serializer.data
 

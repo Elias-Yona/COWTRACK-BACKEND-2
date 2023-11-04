@@ -58,6 +58,14 @@ class BranchSerializer(WritableNestedModelSerializer):
         fields = ['branch_id', 'branch_name', 'phone_number', 'email', 'opening_date',]
 
 
+class SimpleSalesPersonBranchSerializer(WritableNestedModelSerializer):
+    branch = BranchSerializer()
+    class Meta:
+        model = SalesPersonBranch
+        fields = ['salesperson_branch_id', 'branch', 'assignment_date', 'termination_date']
+
+
+
 class SalesPersonBranchSerializer(WritableNestedModelSerializer):
     class Meta:
         model = SalesPersonBranch
