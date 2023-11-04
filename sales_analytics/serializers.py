@@ -1,5 +1,7 @@
 from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer
 from templated_email import send_templated_mail
@@ -63,31 +65,58 @@ class SalesPersonBranchSerializer(WritableNestedModelSerializer):
 
     assignment_date = serializers.DateTimeField(read_only=True)
     termination_date = serializers.DateTimeField(read_only=True)
+
+    def create_salesperson(self, **kwargs):
+        spb = SalesPersonBranch.objects.create(**kwargs["validated_data"])
+        send_templated_mail(
+            template_name='assignment',
+            from_email='admin@cowtrack.com',
+            recipient_list=[spb.salesperson.user.email],
+            context={
+                'salesperson_name': f'{spb.salesperson.user.first_name} {spb.salesperson.user.last_name}',
+                'assignment_date': spb.assignment_date,
+                'branch_name': spb.branch.branch_name,
+                'image': f"https://ui-avatars.com/api/?name={spb.salesperson.user.first_name}+{spb.salesperson.user.last_name}"
+            },
+        )
+
+        return spb
  
     def create(self, validated_data):
         validated_data['salesperson_id'] = self.context['salesperson_pk']
         salesperson_pk = validated_data.get('salesperson_id')
+        print(validated_data)
 
         try:
             spb = SalesPersonBranch.objects.filter(salesperson_id=salesperson_pk).order_by('-assignment_date').first()
-            if not spb.termination_date:
+            # if salesperson has not been removed from the current branch, then remove the salesperson
+            if not spb.termination_date and (spb.branch_id != validated_data["branch"].branch_id):
                 spb.termination_date = timezone.now()
                 spb.save()
 
-            send_templated_mail(
-                template_name='termination',
-                from_email='admin@cowtrack.com',
-                recipient_list=[spb.salesperson.user.email],
-                context={
-                    'salesperson_name': f'{spb.salesperson.user.first_name} {spb.salesperson.user.last_name}',
-                    'termination_date': spb.termination_date,
-                    'branch_name': spb.branch.branch_name,
-                    'image': f"https://ui-avatars.com/api/?name={spb.salesperson.user.first_name}+{spb.salesperson.user.last_name}"
-                },
-            )
+                send_templated_mail(
+                    template_name='termination',
+                    from_email='admin@cowtrack.com',
+                    recipient_list=[spb.salesperson.user.email],
+                    context={
+                        'salesperson_name': f'{spb.salesperson.user.first_name} {spb.salesperson.user.last_name}',
+                        'termination_date': spb.termination_date,
+                        'branch_name': spb.branch.branch_name,
+                        'image': f"https://ui-avatars.com/api/?name={spb.salesperson.user.first_name}+{spb.salesperson.user.last_name}"
+                    },
+                )
+            
+                # assign the salesperson to the new branch
+                spb = self.create_salesperson(validated_data=validated_data)
+
+            elif not spb.termination_date and (spb.branch_id == validated_data["branch"].branch_id):
+                raise ValidationError({'message': 'Salesperson is already assigned to the branch'})
+                
+            elif spb.termination_date:
+                spb = self.create_salesperson(validated_data=validated_data)
+           
         except SalesPersonBranch.DoesNotExist:
-            print("**************** im hereeeeeeeeeeeeeeeeeeeee")
-            # validated_data['assignment_date'] = timezone.now()
+            validated_data['assignment_date'] = timezone.now()
             print(validated_data)
             return super().create(validated_data)
 

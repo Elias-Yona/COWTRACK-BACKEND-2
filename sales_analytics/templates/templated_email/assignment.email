@@ -1,0 +1,24 @@
+{% extends 'templated_email/base.html' %}
+
+{% block subject %}
+   Branch Termination email
+{% endblock %}
+
+
+{% block content %}
+  
+    <P>Dear {{ salesperson_name }},</P>
+
+    <P>
+        We are pleased to inform you that you have been assigned to the {{ branch_name }} branch as of {{ assignment_date }}. We believe your skills and experience will be a great asset to our team in this branch.
+
+        If you have any questions or need further clarification, please feel free to reach out to us. We look forward to your positive contributions to our branch.
+    </P>
+
+    <P>
+    Best Regards, </br>
+    Admin
+    </P>
+
+  
+{% endblock %}
