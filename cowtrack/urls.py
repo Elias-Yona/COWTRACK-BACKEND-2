@@ -22,4 +22,5 @@ urlpatterns = [
     path('users/', include('sales_analytics.urls')),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
+    path("__debug__/", include("debug_toolbar.urls")),
 ]
