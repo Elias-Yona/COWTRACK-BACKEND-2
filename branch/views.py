@@ -40,6 +40,5 @@ class SalesPersonViewSet(ModelViewSet):
            serializer.save()
            return Response(serializer.data)
        
-        print("i'm here")
         serializer = self.get_serializer(salesperson)
         return Response(serializer.data)
