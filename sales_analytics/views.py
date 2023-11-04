@@ -4,8 +4,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer
-from .models import Customer, SalesPerson
+from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
+from .models import Customer, SalesPerson, Branch
 from .permissions import IsSuperUser, IsSalesperson
 
 
@@ -42,3 +42,9 @@ class SalesPersonViewSet(ModelViewSet):
        
         serializer = self.get_serializer(salesperson)
         return Response(serializer.data)
+
+
+class BranchViewSet(ModelViewSet):
+    serializer_class = BranchSerializer
+    queryset = Branch.objects.all().order_by('-opening_date')
+    permission_classes = (IsSuperUser,)
