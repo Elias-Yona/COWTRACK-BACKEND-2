@@ -20,3 +20,12 @@ class IsSalesperson(permissions.BasePermission):
     def has_permission(self, request, view):
         user = get_object_or_404(User, username=request.user)
         return user.role == 'salesperson'
+
+
+class IsManager(permissions.BasePermission):
+    """
+    Allows access only to managers.
+    """
+    def has_permission(self, request, view):
+        user = get_object_or_404(User, username=request.user)
+        return user.role == 'manager'
