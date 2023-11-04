@@ -5,8 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
+from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
-from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager
+from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
 from .permissions import IsSuperUser, IsSalesperson, IsManager
 
 
@@ -92,3 +93,9 @@ class SalesPersonBranchViewSet(ModelViewSet):
       context = super().get_serializer_context()
       context.update({'salesperson_pk': self.kwargs['salesperson_pk']})
       return context
+
+
+class SupplierViewSet(ModelViewSet):
+    serializer_class = SupplierSerializer
+    queryset = Supplier.objects.all().select_related('user').order_by('-user__date_joined')
+    permission_classes = (IsSuperUser,)
