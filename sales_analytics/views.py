@@ -28,12 +28,12 @@ class UserViewSet(ModelViewSet):
 
 class SalesPersonViewSet(ModelViewSet):
     serializer_class = SalesPersonSerializer
-    queryset = SalesPerson.objects.all().order_by('-user__date_joined')
+    queryset = SalesPerson.objects.all().select_related('user').order_by('-user__date_joined')
     permission_classes = (IsSuperUser,)
 
     @action(detail=False, methods=['get', 'put'], permission_classes=[IsAuthenticated, IsSalesperson])
     def me(self, request):
-        salesperson = get_object_or_404(SalesPerson, user=request.user)
+        salesperson = get_object_or_404(SalesPerson.objects.select_related('user'), user=request.user)
 
         if request.method == 'PUT':
            serializer = SalesPersonSerializer(salesperson, data=request.data, partial=True)
@@ -44,7 +44,7 @@ class SalesPersonViewSet(ModelViewSet):
         serializer = self.get_serializer(salesperson)
         response_data = serializer.data
 
-        branches = SalesPersonBranch.objects.filter(salesperson=salesperson).order_by('-assignment_date')
+        branches = SalesPersonBranch.objects.filter(salesperson=salesperson).select_related("salesperson").select_related("branch").order_by('-assignment_date')
         branch_serializer = SimpleSalesPersonBranchSerializer(branches, many=True)
 
         response_data['branches'] = branch_serializer.data
