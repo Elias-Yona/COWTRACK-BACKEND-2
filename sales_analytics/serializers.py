@@ -219,8 +219,6 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(WritableNestedModelSerializer):
-    category = ProductCategorySerializer()
-    branch = BranchSerializer()
     cost_price = MoneyField(max_digits=19, decimal_places=4)
     selling_price = MoneyField(max_digits=19, decimal_places=4)
 
