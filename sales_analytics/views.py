@@ -7,9 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
 from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
-from .serializers import ProductCategorySerializer, ProductSerializer
+from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
-from .models import Product
+from .models import Product, PaymentMethod
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly
 
 
@@ -112,4 +112,10 @@ class ProductCategoryViewSet(ModelViewSet):
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     queryset = Product.objects.all().select_related('branch').select_related('category').order_by('-product_id')
+    permission_classes = (IsSuperUserOrReadOnly,)
+
+
+class PaymentMethodViewSet(ModelViewSet):
+    serializer_class = PaymentMethodSerializer
+    queryset = PaymentMethod.objects.all()
     permission_classes = (IsSuperUserOrReadOnly,)
