@@ -283,6 +283,7 @@ class SaleSerializer(WritableNestedModelSerializer):
     sales_person = SalesPersonSerializer()
     cart = CartWriteSerializer()
     payment_method = PaymentMethodSerializer()
+    amount = MoneyField(max_digits=19, decimal_places=4)
 
     class Meta:
         model = Sale
