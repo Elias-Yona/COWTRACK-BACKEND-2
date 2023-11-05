@@ -228,7 +228,6 @@ class ProductSerializer(WritableNestedModelSerializer):
         fields = ['product_id', 'product_name', 'cost_price_currency', 'cost_price', 'selling_price_currency', 'selling_price', 'is_serialized',
                   'serial_number', 'category', 'branch']
 
-
     def create(self, validated_data):
         serial_number = validated_data.get('serial_number')
         if serial_number is not None:
@@ -248,7 +247,7 @@ class SimpleProductCartSerializer(serializers.Serializer):
     serial_number = serializers.CharField(max_length=50)
 
 
-class CartReadSerializer(serializers.ModelSerializer):
+class CartReadSerializer(WritableNestedModelSerializer):
     total_price = serializers.SerializerMethodField('get_total_price')
     product = SimpleProductCartSerializer(read_only=True)
 
@@ -259,8 +258,17 @@ class CartReadSerializer(serializers.ModelSerializer):
     def get_total_price(self, cart):
         return cart.number_of_items * cart.product.selling_price.amount
     
+
+class CartUpdateSerializer(serializers.Serializer):
+    number_of_items = serializers.IntegerField()
+
+    def update(self, instance, validated_data):
+       instance.number_of_items = validated_data.get('number_of_items', instance.number_of_items)
+       instance.save()
+       return instance
     
-class CartWriteSerializer(serializers.ModelSerializer):
+
+class CartWriteSerializer(WritableNestedModelSerializer):
     total_price = serializers.SerializerMethodField('get_total_price')
 
     class Meta:

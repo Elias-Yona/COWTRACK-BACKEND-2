@@ -8,7 +8,7 @@ from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializ
 from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
 from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
-from .serializers import CartReadSerializer, CartWriteSerializer
+from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product, PaymentMethod, Cart
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
@@ -133,6 +133,8 @@ class CartViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return CartReadSerializer
+        elif self.request.method == 'PUT':
+            return CartUpdateSerializer
         return CartWriteSerializer
 
     def list(self, request, *args, **kwargs):
