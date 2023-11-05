@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from djmoney.models.fields import MoneyField
+from djmoney.serializers import MoneyField
 
 
 class Customer(models.Model):
@@ -93,7 +94,7 @@ class Product(models.Model):
         max_digits=19, decimal_places=4, default_currency='kES')
     selling_price = MoneyField(
         max_digits=19, decimal_places=4, default_currency='KES')
-    is_serialized = models.BooleanField(default=1)
+    is_serialized = models.BooleanField(default=0)
     serial_number = models.CharField(max_length=50, null=True)
     category = models.ForeignKey(
         ProductCategory, on_delete=models.SET_NULL, null=True)
@@ -104,3 +105,7 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.serial_number
 
+
+class PaymentMethod(models.Model):
+    payment_method_id = models.BigAutoField(primary_key=True)
+    method_name = models.CharField(max_length=50)
