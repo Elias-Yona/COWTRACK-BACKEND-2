@@ -146,3 +146,14 @@ class Sale(models.Model):
        if not self.transaction_id:
            self.transaction_id = 'CWT' + ''.join(random.choices(string.digits, k=7)) + ''.join(random.choices(string.ascii_uppercase, k=4)) + ''.join(random.choices(string.digits, k=5))
        super(Sale, self).save(*args, **kwargs)
+
+
+class CompletedSales(models.Model):
+    sale_id = models.BigAutoField(primary_key=True)
+    completed_at = models.DateTimeField(auto_now_add=True)
+    total_amount = MoneyField(
+        max_digits=19, decimal_places=4, default_currency='KES')
+    branch = models.ForeignKey(
+        Branch, on_delete=models.SET_NULL, null=True)
+    salesperson = models.ForeignKey(
+        SalesPerson, on_delete=models.SET_NULL, null=True)
