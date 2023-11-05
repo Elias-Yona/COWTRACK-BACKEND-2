@@ -101,7 +101,6 @@ class Product(models.Model):
     branch = models.ForeignKey(
         Branch, on_delete=models.SET_NULL, null=True)
 
-
     def __str__(self) -> str:
         return self.serial_number
 
@@ -109,3 +108,6 @@ class Product(models.Model):
 class PaymentMethod(models.Model):
     payment_method_id = models.BigAutoField(primary_key=True)
     method_name = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.method_name
