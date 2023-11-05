@@ -255,3 +255,6 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['cart_id', 'number_of_items', 'product', 'total_price']
+
+    def get_total_price(self, cart):
+        return cart.number_of_items * cart.product.selling_price.amount
