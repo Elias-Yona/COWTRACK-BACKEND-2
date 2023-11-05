@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateSerializer
+from djmoney.contrib.django_rest_framework import MoneyField
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
@@ -220,7 +221,9 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(WritableNestedModelSerializer):
     category = ProductCategorySerializer()
     branch = BranchSerializer()
-    
+    cost_price = MoneyField(max_digits=19, decimal_places=4)
+    selling_price = MoneyField(max_digits=19, decimal_places=4)
+
     class Meta:
         model = Product
         fields = ['product_id', 'product_name', 'cost_price_currency', 'cost_price', 'selling_price_currency', 'selling_price', 'is_serialized',
