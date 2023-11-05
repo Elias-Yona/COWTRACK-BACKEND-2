@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
 from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
-from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer, CartSerializer
+from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
+from .serializers import CartReadSerializer, CartWriteSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product, PaymentMethod, Cart
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
@@ -122,6 +123,10 @@ class PaymentMethodViewSet(ModelViewSet):
 
 
 class CartViewSet(ModelViewSet):
-    serializer_class = CartSerializer
-    queryset = Cart.objects.all().select_related('product')
+    queryset = Cart.objects.all().select_related('product').order_by('-product_id')
     permission_classes = (CanCRUDCart,)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CartReadSerializer
+        return CartWriteSerializer

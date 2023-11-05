@@ -102,7 +102,7 @@ class Product(models.Model):
         Branch, on_delete=models.SET_NULL, null=True)
 
     def __str__(self) -> str:
-        return self.serial_number
+        return self.product_name
 
 
 class PaymentMethod(models.Model):

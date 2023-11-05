@@ -248,9 +248,20 @@ class SimpleProductCartSerializer(serializers.Serializer):
     serial_number = serializers.CharField(max_length=50)
 
 
-class CartSerializer(serializers.ModelSerializer):
+class CartReadSerializer(serializers.ModelSerializer):
     total_price = serializers.SerializerMethodField('get_total_price')
-    product = SimpleProductCartSerializer()
+    product = SimpleProductCartSerializer(read_only=True)
+
+    class Meta:
+        model = Cart
+        fields = ['cart_id', 'number_of_items', 'product', 'total_price']
+
+    def get_total_price(self, cart):
+        return cart.number_of_items * cart.product.selling_price.amount
+    
+    
+class CartWriteSerializer(serializers.ModelSerializer):
+    total_price = serializers.SerializerMethodField('get_total_price')
 
     class Meta:
         model = Cart
