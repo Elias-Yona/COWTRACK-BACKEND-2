@@ -8,9 +8,9 @@ from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializ
 from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
 from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
-from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer
+from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer, SaleSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
-from .models import Product, PaymentMethod, Cart
+from .models import Product, PaymentMethod, Cart, Sale
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
 
 
@@ -142,3 +142,9 @@ class CartViewSet(ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         price = sum(cart['total_price'] for cart in serializer.data)
         return Response({'results': serializer.data, 'price': price})
+
+
+class SaleViewSet(ModelViewSet):
+    serializer_class = SaleSerializer
+    queryset = Sale.objects.all()
+    permission_classes = (IsSuperUser,)
