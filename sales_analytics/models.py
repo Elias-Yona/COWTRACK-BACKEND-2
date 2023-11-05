@@ -141,6 +141,7 @@ class Sale(models.Model):
         Cart, on_delete=models.SET_NULL, null=True)
     payment_method = models.ForeignKey(
         PaymentMethod, on_delete=models.SET_NULL, null=True)
+    is_completed = models.BooleanField(default=0)
 
     def save(self, *args, **kwargs):
        if not self.transaction_id:

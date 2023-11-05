@@ -10,7 +10,7 @@ from djmoney.contrib.django_rest_framework import MoneyField
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
-from .models import ProductCategory, Product, PaymentMethod, Cart, Sale
+from .models import ProductCategory, Product, PaymentMethod, Cart, Sale, CompletedSales
 
 
 User = get_user_model()
@@ -299,3 +299,13 @@ class SaleWriteSerializer(WritableNestedModelSerializer):
         model = Sale
         fields = ['sale_id', 'amount', 'transaction_date', 'transaction_id', 'awarded_points',
                   'sales_person', 'cart', 'payment_method']
+
+
+class CompletedSalesSerializer(WritableNestedModelSerializer):
+    total_amount = MoneyField(max_digits=19, decimal_places=4)
+    branch = BranchSerializer(read_only=True)
+    salesperson = SalesPersonSerializer(read_only=True)
+
+    class Meta:
+        model = CompletedSales
+        fields = ['sale_id', 'completed_at', 'total_amount', 'branch', 'salesperson']
