@@ -221,8 +221,16 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(WritableNestedModelSerializer):
     cost_price = MoneyField(max_digits=19, decimal_places=4)
     selling_price = MoneyField(max_digits=19, decimal_places=4)
+    is_serialized = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Product
         fields = ['product_id', 'product_name', 'cost_price_currency', 'cost_price', 'selling_price_currency', 'selling_price', 'is_serialized',
                   'serial_number', 'category', 'branch']
+
+
+    def create(self, validated_data):
+        serial_number = validated_data.get('serial_number')
+        if serial_number is not None:
+            validated_data['is_serialized'] = 1
+        return super().create(validated_data)
