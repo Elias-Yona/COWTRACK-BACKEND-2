@@ -10,7 +10,7 @@ from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSer
 from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer, CartSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product, PaymentMethod, Cart
-from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly
+from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
 
 
 User = get_user_model()
@@ -124,4 +124,4 @@ class PaymentMethodViewSet(ModelViewSet):
 class CartViewSet(ModelViewSet):
     serializer_class = CartSerializer
     queryset = Cart.objects.all().select_related('product')
-    permission_classes = (IsSuperUserOrReadOnly,)
+    permission_classes = (CanCRUDCart,)

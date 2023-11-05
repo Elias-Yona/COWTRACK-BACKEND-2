@@ -39,3 +39,12 @@ class IsSuperUserOrReadOnly(permissions.BasePermission):
        if request.method in permissions.SAFE_METHODS:
            return True
        return request.user and request.user.is_superuser
+
+
+class CanCRUDCart(permissions.BasePermission):
+    """
+    Give read write access to superusers, managers, salespersons, supervisors
+    """
+    def has_permission(self, request, view):
+        return request.user and (request.user.is_superuser or request.user.role.manager or \
+                                 request.user.role.salesperson or request.user.role.supervisor)
