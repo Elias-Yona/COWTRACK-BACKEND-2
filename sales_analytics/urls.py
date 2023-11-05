@@ -14,6 +14,7 @@ router.register('product-categories', views.ProductCategoryViewSet, basename='pr
 router.register('products', views.ProductViewSet, basename='products-list')
 router.register('payment-methods', views.PaymentMethodViewSet, basename='paymentmethods-list')
 router.register('cart', views.CartViewSet, basename='cart-list')
+router.register('sales', views.SaleViewSet, basename='sales-list')
 
 
 salesperson_router = routers.NestedSimpleRouter(router, r'salespersons', lookup='salesperson')
