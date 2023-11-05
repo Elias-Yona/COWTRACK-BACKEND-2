@@ -10,6 +10,7 @@ router.register('salespersons', views.SalesPersonViewSet, basename='salespersons
 router.register('branches', views.BranchViewSet, basename='branches-list')
 router.register('managers', views.ManagerViewSet, basename='managers-list')
 router.register('suppliers', views.SupplierViewSet, basename='suppliers-list')
+router.register('product-categories', views.SupplierViewSet, basename='productcategories-list')
 
 salesperson_router = routers.NestedSimpleRouter(router, r'salespersons', lookup='salesperson')
 salesperson_router.register(r'branches', views.SalesPersonBranchViewSet, basename='salesperson-branch')
