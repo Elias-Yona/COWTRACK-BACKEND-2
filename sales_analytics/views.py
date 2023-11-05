@@ -8,7 +8,8 @@ from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializ
 from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
 from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
-from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer, SaleSerializer
+from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer
+from .serializers import SaleReadSerializer, SaleWriteSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product, PaymentMethod, Cart, Sale
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
@@ -145,6 +146,10 @@ class CartViewSet(ModelViewSet):
 
 
 class SaleViewSet(ModelViewSet):
-    serializer_class = SaleSerializer
     queryset = Sale.objects.all()
     permission_classes = (IsSuperUser,)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return SaleReadSerializer
+        return SaleWriteSerializer

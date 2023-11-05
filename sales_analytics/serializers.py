@@ -279,10 +279,19 @@ class CartWriteSerializer(WritableNestedModelSerializer):
         return cart.number_of_items * cart.product.selling_price.amount
 
 
-class SaleSerializer(WritableNestedModelSerializer):
+class SaleReadSerializer(WritableNestedModelSerializer):
     sales_person = SalesPersonSerializer()
     cart = CartWriteSerializer()
     payment_method = PaymentMethodSerializer()
+    amount = MoneyField(max_digits=19, decimal_places=4)
+
+    class Meta:
+        model = Sale
+        fields = ['sale_id', 'amount', 'transaction_date', 'transaction_id', 'awarded_points',
+                  'sales_person', 'cart', 'payment_method']
+
+
+class SaleWriteSerializer(WritableNestedModelSerializer):
     amount = MoneyField(max_digits=19, decimal_places=4)
 
     class Meta:

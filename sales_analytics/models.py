@@ -125,7 +125,7 @@ class Cart(models.Model):
         Customer, on_delete=models.SET_NULL, null=True)
 
     def __str__(self) -> str:
-        return self.card_id
+        return str(self.cart_id)
 
 
 class Sale(models.Model):
