@@ -149,7 +149,7 @@ class Sale(models.Model):
        super(Sale, self).save(*args, **kwargs)
 
 
-class CompletedSales(models.Model):
+class CompletedSale(models.Model):
     sale_id = models.BigAutoField(primary_key=True)
     completed_at = models.DateTimeField(auto_now_add=True)
     total_amount = MoneyField(
