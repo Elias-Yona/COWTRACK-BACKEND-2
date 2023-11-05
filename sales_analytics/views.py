@@ -134,3 +134,9 @@ class CartViewSet(ModelViewSet):
         if self.request.method == 'GET':
             return CartReadSerializer
         return CartWriteSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        price = sum(cart['total_price'] for cart in serializer.data)
+        return Response({'results': serializer.data, 'price': price})
