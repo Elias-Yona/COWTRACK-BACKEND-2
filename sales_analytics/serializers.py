@@ -10,7 +10,7 @@ from djmoney.contrib.django_rest_framework import MoneyField
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
-from .models import ProductCategory, Product
+from .models import ProductCategory, Product, PaymentMethod
 
 
 User = get_user_model()
@@ -234,3 +234,9 @@ class ProductSerializer(WritableNestedModelSerializer):
         if serial_number is not None:
             validated_data['is_serialized'] = 1
         return super().create(validated_data)
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+        fields = ['payment_method_id', 'method_name']
