@@ -126,6 +126,10 @@ class CartViewSet(ModelViewSet):
     queryset = Cart.objects.all().select_related('product').order_by('-product_id')
     permission_classes = (CanCRUDCart,)
 
+    def get_queryset(self):
+       customer_id = self.kwargs['customer_pk']
+       return Cart.objects.filter(customer_id=customer_id).order_by('-cart_id')
+    
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return CartReadSerializer

@@ -20,6 +20,6 @@ salesperson_router = routers.NestedSimpleRouter(router, r'salespersons', lookup=
 salesperson_router.register(r'branches', views.SalesPersonBranchViewSet, basename='salesperson-branch')
 
 customers_router = routers.NestedSimpleRouter(router, r'customers', lookup='customer')
-customers_router.register(r'cart', views.SalesPersonBranchViewSet, basename='salesperson-branch')
+customers_router.register(r'cart', views.CartViewSet, basename='carts')
 
-urlpatterns = router.urls + salesperson_router.urls
+urlpatterns = router.urls + salesperson_router.urls + customers_router.urls
