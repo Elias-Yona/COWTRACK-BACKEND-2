@@ -10,7 +10,7 @@ from djmoney.contrib.django_rest_framework import MoneyField
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
-from .models import ProductCategory, Product, PaymentMethod
+from .models import ProductCategory, Product, PaymentMethod, Cart
 
 
 User = get_user_model()
@@ -240,3 +240,18 @@ class PaymentMethodSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaymentMethod
         fields = ['payment_method_id', 'method_name']
+
+
+class SimpleProductCartSerializer(serializers.Serializer):
+    product_name = serializers.CharField(max_length=50)
+    selling_price = MoneyField(max_digits=19, decimal_places=2)
+    serial_number = serializers.CharField(max_length=50)
+
+
+class CartSerializer(serializers.ModelSerializer):
+    total_price = serializers.SerializerMethodField('get_total_price')
+    product = SimpleProductCartSerializer()
+
+    class Meta:
+        model = Cart
+        fields = ['cart_id', 'number_of_items', 'product', 'total_price']
