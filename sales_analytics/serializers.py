@@ -9,6 +9,8 @@ from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateS
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
+from .models import ProductCategory
+
 
 User = get_user_model()
 
@@ -45,6 +47,7 @@ class CustomerSerializer(WritableNestedModelSerializer):
         user = User.objects.create(**user_data)
 
         return Customer.objects.create(user=user, **validated_data)
+
 
 class SalesPersonSerializer(WritableNestedModelSerializer):
     image = serializers.SerializerMethodField('get_image')
@@ -208,3 +211,7 @@ class SupplierSerializer(WritableNestedModelSerializer):
         return Supplier.objects.create(user=user, **validated_data)
 
 
+class ProductCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCategory
+        fields = ['category_id', 'category_name']
