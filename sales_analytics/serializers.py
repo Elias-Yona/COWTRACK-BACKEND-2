@@ -54,7 +54,6 @@ class SalesPersonSerializer(WritableNestedModelSerializer):
         model = SalesPerson
         fields = ['sales_person_id', 'phone_number', 'image', 'user']
    
-
     def get_image(self, salesperson):
         return f"https://ui-avatars.com/api/?name={salesperson.user.first_name}+{salesperson.user.last_name}"
     
@@ -207,3 +206,5 @@ class SupplierSerializer(WritableNestedModelSerializer):
         user = User.objects.create(**user_data)
 
         return Supplier.objects.create(user=user, **validated_data)
+
+

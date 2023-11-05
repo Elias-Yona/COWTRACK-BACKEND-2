@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from djmoney.models.fields import MoneyField
 
 
 class Customer(models.Model):
@@ -75,3 +76,29 @@ class SalesPersonBranch(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     assignment_date = models.DateTimeField(auto_now_add=True)
     termination_date = models.DateTimeField(null=True)
+
+
+class ProductCategory(models.Model):
+    category_id = models.BigAutoField(primary_key=True)
+    category_name = models.CharField(max_length=50)
+
+
+class Product(models.Model):
+    product_id = models.BigAutoField(primary_key=True)
+    product_name = models.CharField(max_length=50)
+    cost_price = MoneyField(
+        max_digits=19, decimal_places=4, default_currency='kES')
+    selling_price = MoneyField(
+        max_digits=19, decimal_places=4, default_currency='KES')
+    is_serialized = models.BooleanField(default=1)
+    serial_number = models.CharField(max_length=50, null=True)
+    category = models.ForeignKey(
+        ProductCategory, on_delete=models.SET_NULL, null=True)
+    branch = models.ForeignKey(
+        Branch, on_delete=models.SET_NULL, null=True)
+
+
+    def __str__(self) -> str:
+        return self.serial_number
+
+
