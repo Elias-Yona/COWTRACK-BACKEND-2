@@ -29,3 +29,13 @@ class IsManager(permissions.BasePermission):
     def has_permission(self, request, view):
         user = get_object_or_404(User, username=request.user)
         return user.role == 'manager'
+
+
+class IsSuperUserOrReadOnly(permissions.BasePermission):
+    """
+    Give read write access to superusers
+    """
+    def has_permission(self, request, view):
+       if request.method in permissions.SAFE_METHODS:
+           return True
+       return request.user and request.user.is_superuser

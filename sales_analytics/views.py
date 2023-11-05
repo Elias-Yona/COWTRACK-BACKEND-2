@@ -10,7 +10,7 @@ from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSer
 from .serializers import ProductCategorySerializer, ProductSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product
-from .permissions import IsSuperUser, IsSalesperson, IsManager
+from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly
 
 
 User = get_user_model()
@@ -106,10 +106,10 @@ class SupplierViewSet(ModelViewSet):
 class ProductCategoryViewSet(ModelViewSet):
     serializer_class = ProductCategorySerializer
     queryset = ProductCategory.objects.all()
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsSuperUserOrReadOnly,)
 
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
-    queryset = Product.objects.all().select_related('branch').select_related('category')
-    permission_classes = (IsSuperUser,)
+    queryset = Product.objects.all().select_related('branch').select_related('category').order_by('-product_id')
+    permission_classes = (IsSuperUserOrReadOnly,)
