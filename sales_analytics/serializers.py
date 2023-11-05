@@ -9,7 +9,7 @@ from djoser.serializers import UserSerializer as BaseUserSerializer, UserCreateS
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
-from .models import ProductCategory
+from .models import ProductCategory, Product
 
 
 User = get_user_model()
@@ -215,3 +215,13 @@ class ProductCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCategory
         fields = ['category_id', 'category_name']
+
+
+class ProductSerializer(WritableNestedModelSerializer):
+    category = ProductCategorySerializer()
+    branch = BranchSerializer()
+    
+    class Meta:
+        model = Product
+        fields = ['product_id', 'product_name', 'cost_price_currency', 'cost_price', 'selling_price_currency', 'selling_price', 'is_serialized',
+                  'serial_number', 'category', 'branch']
