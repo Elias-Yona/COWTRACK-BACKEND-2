@@ -111,3 +111,10 @@ class PaymentMethod(models.Model):
 
     def __str__(self) -> str:
         return self.method_name
+
+
+class Cart(models.Model):
+    cart_id = models.BigAutoField(primary_key=True)
+    number_of_items = models.IntegerField()
+    product = models.ForeignKey(
+        Product, on_delete=models.SET_NULL, null=True)
