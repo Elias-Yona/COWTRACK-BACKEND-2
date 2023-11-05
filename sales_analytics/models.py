@@ -118,3 +118,5 @@ class Cart(models.Model):
     number_of_items = models.IntegerField()
     product = models.ForeignKey(
         Product, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET_NULL, null=True)
