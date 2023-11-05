@@ -293,6 +293,7 @@ class SaleReadSerializer(WritableNestedModelSerializer):
 
 class SaleWriteSerializer(WritableNestedModelSerializer):
     amount = MoneyField(max_digits=19, decimal_places=4)
+    cart = CartWriteSerializer()
 
     class Meta:
         model = Sale
