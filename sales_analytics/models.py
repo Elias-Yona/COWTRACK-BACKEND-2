@@ -82,6 +82,9 @@ class ProductCategory(models.Model):
     category_id = models.BigAutoField(primary_key=True)
     category_name = models.CharField(max_length=50)
 
+    def __str__(self) -> str:
+        return self.category_name
+
 
 class Product(models.Model):
     product_id = models.BigAutoField(primary_key=True)
@@ -100,5 +103,4 @@ class Product(models.Model):
 
     def __str__(self) -> str:
         return self.serial_number
-
 
