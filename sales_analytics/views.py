@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
 from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
-from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
+from .serializers import ProductCategorySerializer
+from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .permissions import IsSuperUser, IsSalesperson, IsManager
 
 
@@ -98,4 +99,10 @@ class SalesPersonBranchViewSet(ModelViewSet):
 class SupplierViewSet(ModelViewSet):
     serializer_class = SupplierSerializer
     queryset = Supplier.objects.all().select_related('user').order_by('-user__date_joined')
+    permission_classes = (IsSuperUser,)
+
+
+class ProductCategoryViewSet(ModelViewSet):
+    serializer_class = ProductCategorySerializer
+    queryset = ProductCategory.objects.all()
     permission_classes = (IsSuperUser,)
