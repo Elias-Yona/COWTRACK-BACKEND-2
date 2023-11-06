@@ -5,6 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from .serializers import CustomerSerializer, UserSerializer, SalesPersonSerializer, BranchSerializer
 from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
@@ -166,8 +167,12 @@ class SaleViewSet(ModelViewSet):
         sales = Sale.objects.filter(salesperson_id=salesperson_id, is_completed=0).select_related('salesperson') \
             .select_related('cart').select_related('payment_method').order_by('-transaction_date')
         
+        if not sales:
+            raise ValidationError({"message": "Can't complete sale cart is empty"})
+        
         with transaction.atomic():
-            latest_branch = SalesPersonBranch.objects.filter(salesperson_id=salesperson_id).order_by('-salesperson_branch_id').first()
+            latest_branch = SalesPersonBranch.objects.filter(salesperson_id=salesperson_id) \
+                .select_related('salesperson').select_related('branch').order_by('-salesperson_branch_id').first()
             total_price = 0
 
             for sale in sales:

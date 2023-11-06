@@ -285,20 +285,22 @@ class SaleReadSerializer(WritableNestedModelSerializer):
     cart = CartWriteSerializer()
     payment_method = PaymentMethodSerializer()
     transaction_id = serializers.CharField(max_length=20, read_only=True)
+    is_completed = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Sale
-        fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points',
+        fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points', 'is_completed',
                   'salesperson', 'cart', 'payment_method']
 
 
 class SaleWriteSerializer(WritableNestedModelSerializer):
     cart = CartWriteSerializer()
     transaction_id = serializers.CharField(max_length=20, read_only=True)
+    is_completed = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Sale
-        fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points',
+        fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points', 'is_completed',
                   'salesperson', 'cart', 'payment_method']
 
 
