@@ -130,8 +130,6 @@ class Cart(models.Model):
 
 class Sale(models.Model):
     sale_id = models.BigAutoField(primary_key=True)
-    # amount = MoneyField(
-    #     max_digits=19, decimal_places=4, default_currency='KES')
     transaction_date = models.DateTimeField(auto_now_add=True)
     awarded_points = models.IntegerField()
     transaction_id = models.CharField(max_length=20, blank=True)
@@ -139,8 +137,6 @@ class Sale(models.Model):
         SalesPerson, on_delete=models.SET_NULL, null=True)
     cart = models.ForeignKey(
         Cart, on_delete=models.SET_NULL, null=True)
-    payment_method = models.ForeignKey(
-        PaymentMethod, on_delete=models.SET_NULL, null=True)
     is_completed = models.BooleanField(default=0)
 
     def save(self, *args, **kwargs):
@@ -158,3 +154,5 @@ class CompletedSale(models.Model):
         Branch, on_delete=models.SET_NULL, null=True)
     salesperson = models.ForeignKey(
         SalesPerson, on_delete=models.SET_NULL, null=True)
+    payment_method = models.ForeignKey(
+        PaymentMethod, on_delete=models.SET_NULL, null=True)

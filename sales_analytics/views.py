@@ -12,7 +12,7 @@ from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSer
 from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
 from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer
 from .serializers import SaleReadSerializer, SaleWriteSerializer, CompletedSaleWriteSerializer
-from .serializers import CompletedSaleReadSerializer
+from .serializers import CompletedSaleReadSerializer, CompletedSalePaymentSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product, PaymentMethod, Cart, Sale, CompletedSale
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
@@ -152,23 +152,35 @@ class SaleViewSet(ModelViewSet):
     permission_classes = (IsSuperUser,)
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.action == 'complete_sale':
+            return CompletedSaleReadSerializer
+        elif self.request.method == 'GET':
             return SaleReadSerializer
         return SaleWriteSerializer
 
     def get_queryset(self):
        salesperson_id = self.kwargs['salesperson_pk']
        return Sale.objects.filter(salesperson_id=salesperson_id).select_related('salesperson') \
-            .select_related('cart').select_related('payment_method').order_by('-transaction_date')
+            .select_related('cart').order_by('-transaction_date')
 
     @action(detail=False, methods=['post', 'get'])
     def complete_sale(self, request, **kwargs):
         salesperson_id = self.kwargs['salesperson_pk']
+        
         sales = Sale.objects.filter(salesperson_id=salesperson_id, is_completed=0).select_related('salesperson') \
-            .select_related('cart').select_related('payment_method').order_by('-transaction_date')
+            .select_related('cart').order_by('-transaction_date')
         
         if not sales:
             raise ValidationError({"message": "Can't complete sale cart is empty"})
+
+        payment_method = request.data.get('payment_method')
+
+        if not payment_method:
+            raise ValidationError({"message": "A payment method must be present"})
+
+        if self.request.method == "GET":
+            completed_sales = CompletedSale.objects.filter(salesperson_id=salesperson_id)
+            return Response(CompletedSaleReadSerializer(completed_sales).data)
         
         with transaction.atomic():
             latest_branch = SalesPersonBranch.objects.filter(salesperson_id=salesperson_id) \
@@ -183,10 +195,14 @@ class SaleViewSet(ModelViewSet):
 
                 total_price += cart.number_of_items * cart.product.selling_price
 
-            completed_sale = CompletedSale.objects.create(salesperson_id=int(salesperson_id), branch_id=latest_branch.branch_id, total_amount=total_price)
+            completed_sale = CompletedSale.objects.create(
+                salesperson_id=int(salesperson_id), 
+                branch_id=latest_branch.branch_id, 
+                total_amount=total_price,
+                payment_method_id=int(payment_method)
+            )
             
             return Response(CompletedSaleReadSerializer(completed_sale).data)
-
 
 
 class CompletedSaleViewSet(ModelViewSet):

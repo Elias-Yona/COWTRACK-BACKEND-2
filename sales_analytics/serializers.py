@@ -283,14 +283,13 @@ class CartWriteSerializer(WritableNestedModelSerializer):
 class SaleReadSerializer(WritableNestedModelSerializer):
     salesperson = SalesPersonSerializer()
     cart = CartWriteSerializer()
-    payment_method = PaymentMethodSerializer()
     transaction_id = serializers.CharField(max_length=20, read_only=True)
     is_completed = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Sale
         fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points', 'is_completed',
-                  'salesperson', 'cart', 'payment_method']
+                  'salesperson', 'cart']
 
 
 class SaleWriteSerializer(WritableNestedModelSerializer):
@@ -301,17 +300,17 @@ class SaleWriteSerializer(WritableNestedModelSerializer):
     class Meta:
         model = Sale
         fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points', 'is_completed',
-                  'salesperson', 'cart', 'payment_method']
+                  'salesperson', 'cart']
 
 
 class CompletedSaleReadSerializer(WritableNestedModelSerializer):
-    total_amount = MoneyField(max_digits=19, decimal_places=4)
-    branch = BranchSerializer()
-    salesperson = SalesPersonSerializer()
+    total_amount = MoneyField(max_digits=19, decimal_places=4, read_only=True)
+    branch = BranchSerializer(read_only=True)
+    salesperson = SalesPersonSerializer(read_only=True)
 
     class Meta:
         model = CompletedSale
-        fields = ['sale_id', 'completed_at', 'total_amount', 'branch', 'salesperson']
+        fields = ['sale_id', 'completed_at', 'total_amount', 'branch', 'salesperson', 'payment_method']
 
 
 class CompletedSaleWriteSerializer(WritableNestedModelSerializer):
@@ -319,4 +318,8 @@ class CompletedSaleWriteSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = CompletedSale
-        fields = ['sale_id', 'completed_at', 'total_amount', 'branch', 'salesperson']
+        fields = ['sale_id', 'completed_at', 'total_amount', 'branch', 'salesperson', 'payment_method']
+
+
+class CompletedSalePaymentSerializer(serializers.Serializer):
+    method_name = serializers.CharField(max_length=50)
