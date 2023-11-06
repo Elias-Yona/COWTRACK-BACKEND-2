@@ -130,12 +130,12 @@ class Cart(models.Model):
 
 class Sale(models.Model):
     sale_id = models.BigAutoField(primary_key=True)
-    amount = MoneyField(
-        max_digits=19, decimal_places=4, default_currency='KES')
+    # amount = MoneyField(
+    #     max_digits=19, decimal_places=4, default_currency='KES')
     transaction_date = models.DateTimeField(auto_now_add=True)
     awarded_points = models.IntegerField()
     transaction_id = models.CharField(max_length=20, blank=True)
-    sales_person = models.ForeignKey(
+    salesperson = models.ForeignKey(
         SalesPerson, on_delete=models.SET_NULL, null=True)
     cart = models.ForeignKey(
         Cart, on_delete=models.SET_NULL, null=True)

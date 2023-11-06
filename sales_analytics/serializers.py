@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
@@ -10,7 +11,7 @@ from djmoney.contrib.django_rest_framework import MoneyField
 from templated_email import send_templated_mail
 
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier
-from .models import ProductCategory, Product, PaymentMethod, Cart, Sale, CompletedSales
+from .models import ProductCategory, Product, PaymentMethod, Cart, Sale, CompletedSale
 
 
 User = get_user_model()
@@ -280,32 +281,30 @@ class CartWriteSerializer(WritableNestedModelSerializer):
 
 
 class SaleReadSerializer(WritableNestedModelSerializer):
-    sales_person = SalesPersonSerializer()
+    salesperson = SalesPersonSerializer()
     cart = CartWriteSerializer()
     payment_method = PaymentMethodSerializer()
-    amount = MoneyField(max_digits=19, decimal_places=4)
+    transaction_id = serializers.CharField(max_length=20, read_only=True)
 
     class Meta:
         model = Sale
-        fields = ['sale_id', 'amount', 'transaction_date', 'transaction_id', 'awarded_points',
-                  'sales_person', 'cart', 'payment_method']
+        fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points',
+                  'salesperson', 'cart', 'payment_method']
 
 
 class SaleWriteSerializer(WritableNestedModelSerializer):
-    amount = MoneyField(max_digits=19, decimal_places=4)
     cart = CartWriteSerializer()
+    transaction_id = serializers.CharField(max_length=20, read_only=True)
 
     class Meta:
         model = Sale
-        fields = ['sale_id', 'amount', 'transaction_date', 'transaction_id', 'awarded_points',
-                  'sales_person', 'cart', 'payment_method']
+        fields = ['sale_id', 'transaction_date', 'transaction_id', 'awarded_points',
+                  'salesperson', 'cart', 'payment_method']
 
 
-class CompletedSalesSerializer(WritableNestedModelSerializer):
+class CompletedSaleSerializer(WritableNestedModelSerializer):
     total_amount = MoneyField(max_digits=19, decimal_places=4)
-    branch = BranchSerializer(read_only=True)
-    salesperson = SalesPersonSerializer(read_only=True)
 
     class Meta:
-        model = CompletedSales
+        model = CompletedSale
         fields = ['sale_id', 'completed_at', 'total_amount', 'branch', 'salesperson']

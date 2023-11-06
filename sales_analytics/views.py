@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
@@ -9,9 +10,9 @@ from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
 from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
 from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer
-from .serializers import SaleReadSerializer, SaleWriteSerializer
+from .serializers import SaleReadSerializer, SaleWriteSerializer, CompletedSaleSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
-from .models import Product, PaymentMethod, Cart, Sale
+from .models import Product, PaymentMethod, Cart, Sale, CompletedSale
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
 
 
@@ -146,10 +147,43 @@ class CartViewSet(ModelViewSet):
 
 
 class SaleViewSet(ModelViewSet):
-    queryset = Sale.objects.all()
     permission_classes = (IsSuperUser,)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return SaleReadSerializer
         return SaleWriteSerializer
+
+    def get_queryset(self):
+       salesperson_id = self.kwargs['salesperson_pk']
+       return Sale.objects.filter(salesperson_id=salesperson_id).select_related('salesperson') \
+            .select_related('cart').select_related('payment_method').order_by('-transaction_date')
+
+    @action(detail=False, methods=['post', 'get'])
+    def complete_sale(self, request, **kwargs):
+        salesperson_id = self.kwargs['salesperson_pk']
+        sales = Sale.objects.filter(salesperson_id=salesperson_id, is_completed=0).select_related('salesperson') \
+            .select_related('cart').select_related('payment_method').order_by('-transaction_date')
+        
+        with transaction.atomic():
+            latest_branch = SalesPersonBranch.objects.filter(salesperson_id=salesperson_id).order_by('-salesperson_branch_id').first()
+            total_price = 0
+
+            for sale in sales:
+                sale.is_completed = 1
+                sale.save()
+
+                cart = Cart.objects.get(cart_id=sale.cart_id)
+
+                total_price += cart.number_of_items * cart.product.selling_price
+
+            completed_sale = CompletedSale.objects.create(salesperson_id=int(salesperson_id), branch_id=latest_branch.branch_id, total_amount=total_price)
+            
+            return Response(CompletedSaleSerializer(completed_sale).data)
+
+
+
+class CompletedSaleViewSet(ModelViewSet):
+    queryset = CompletedSale.objects.all().select_related('branch').select_related('salesperson')
+    permission_classes = (IsSuperUser,)
+    serializer_class = CompletedSaleSerializer
