@@ -10,7 +10,8 @@ from .serializers import SupplierSerializer
 from .serializers import SalesPersonBranchSerializer, SimpleSalesPersonBranchSerializer, ManagerSerializer
 from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMethodSerializer
 from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer
-from .serializers import SaleReadSerializer, SaleWriteSerializer, CompletedSaleSerializer
+from .serializers import SaleReadSerializer, SaleWriteSerializer, CompletedSaleWriteSerializer
+from .serializers import CompletedSaleReadSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product, PaymentMethod, Cart, Sale, CompletedSale
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
@@ -179,11 +180,15 @@ class SaleViewSet(ModelViewSet):
 
             completed_sale = CompletedSale.objects.create(salesperson_id=int(salesperson_id), branch_id=latest_branch.branch_id, total_amount=total_price)
             
-            return Response(CompletedSaleSerializer(completed_sale).data)
+            return Response(CompletedSaleReadSerializer(completed_sale).data)
 
 
 
 class CompletedSaleViewSet(ModelViewSet):
     queryset = CompletedSale.objects.all().select_related('branch').select_related('salesperson')
     permission_classes = (IsSuperUser,)
-    serializer_class = CompletedSaleSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CompletedSaleReadSerializer
+        return CompletedSaleWriteSerializer

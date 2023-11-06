@@ -302,7 +302,17 @@ class SaleWriteSerializer(WritableNestedModelSerializer):
                   'salesperson', 'cart', 'payment_method']
 
 
-class CompletedSaleSerializer(WritableNestedModelSerializer):
+class CompletedSaleReadSerializer(WritableNestedModelSerializer):
+    total_amount = MoneyField(max_digits=19, decimal_places=4)
+    branch = BranchSerializer()
+    salesperson = SalesPersonSerializer()
+
+    class Meta:
+        model = CompletedSale
+        fields = ['sale_id', 'completed_at', 'total_amount', 'branch', 'salesperson']
+
+
+class CompletedSaleWriteSerializer(WritableNestedModelSerializer):
     total_amount = MoneyField(max_digits=19, decimal_places=4)
 
     class Meta:
