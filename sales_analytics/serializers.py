@@ -274,7 +274,7 @@ class CartWriteSerializer(WritableNestedModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['cart_id', 'number_of_items', 'product', 'total_price']
+        fields = ['cart_id', 'number_of_items', 'product', 'customer', 'total_price']
 
     def get_total_price(self, cart):
         return cart.number_of_items * cart.product.selling_price.amount
@@ -323,3 +323,11 @@ class CompletedSaleWriteSerializer(WritableNestedModelSerializer):
 
 class CompletedSalePaymentSerializer(serializers.Serializer):
     method_name = serializers.CharField(max_length=50)
+
+
+class MonthlySalesSerializer(serializers.Serializer):
+    year = serializers.IntegerField()
+    month = serializers.IntegerField()
+    number_of_sales = serializers.IntegerField()
+    total_amount = serializers.DecimalField(max_digits=19, decimal_places=4)
+    # branches = serializers.ListField(child=serializers.CharField())

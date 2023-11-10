@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import Count, Sum
+from django.db.models.functions import ExtractYear, ExtractMonth
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
@@ -13,6 +15,7 @@ from .serializers import ProductCategorySerializer, ProductSerializer, PaymentMe
 from .serializers import CartReadSerializer, CartWriteSerializer, CartUpdateSerializer
 from .serializers import SaleReadSerializer, SaleWriteSerializer, CompletedSaleWriteSerializer
 from .serializers import CompletedSaleReadSerializer, CompletedSalePaymentSerializer
+from .serializers import MonthlySalesSerializer
 from .models import Customer, SalesPerson, Branch, SalesPersonBranch, Manager, Supplier, ProductCategory
 from .models import Product, PaymentMethod, Cart, Sale, CompletedSale
 from .permissions import IsSuperUser, IsSalesperson, IsManager, IsSuperUserOrReadOnly, CanCRUDCart
@@ -55,7 +58,20 @@ class SalesPersonViewSet(ModelViewSet):
         branches = SalesPersonBranch.objects.filter(salesperson=salesperson).select_related("salesperson").select_related("branch").order_by('-assignment_date')
         branch_serializer = SimpleSalesPersonBranchSerializer(branches, many=True)
 
+        sales = CompletedSale.objects.filter(salesperson=salesperson).annotate(
+            year=ExtractYear('completed_at'),
+            month=ExtractMonth('completed_at')
+            ).values(
+            'year', 'month', 'branch__branch_name'
+            ).annotate(
+            number_of_sales=Count('sale_id'),
+            total_amount=Sum('total_amount')
+            ).order_by('year', 'month')
+
+        monthly_sales_serializer = MonthlySalesSerializer(sales, many=True)
+
         response_data['branches'] = branch_serializer.data
+        response_data['monthly_sales'] = monthly_sales_serializer.data
 
         return Response(response_data)
 
@@ -149,8 +165,6 @@ class CartViewSet(ModelViewSet):
 
 
 class SaleViewSet(ModelViewSet):
-    permission_classes = (IsSuperUser,)
-
     def get_serializer_class(self):
         if self.action == 'complete_sale':
             return CompletedSaleReadSerializer
@@ -158,10 +172,18 @@ class SaleViewSet(ModelViewSet):
             return SaleReadSerializer
         return SaleWriteSerializer
 
+    def get_permissions(self):
+       if self.request.user.role == 'superuser':
+           return [IsSuperUser()]
+       elif self.request.user.role == 'salesperson':
+           return [IsAuthenticated(), IsSalesperson()]
+
+
     def get_queryset(self):
        salesperson_id = self.kwargs['salesperson_pk']
        return Sale.objects.filter(salesperson_id=salesperson_id).select_related('salesperson') \
             .select_related('cart').order_by('-transaction_date')
+
 
     @action(detail=False, methods=['post', 'get'])
     def complete_sale(self, request, **kwargs):

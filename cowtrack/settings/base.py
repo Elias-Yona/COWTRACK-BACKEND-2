@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'djoser',
+    'corsheaders',
 
     'core',
     'user_management',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -149,3 +151,4 @@ SIMPLE_JWT = {
 }
 
 TEMPLATED_EMAIL_BACKEND = 'templated_email.backends.vanilla_django.TemplateBackend'
+
